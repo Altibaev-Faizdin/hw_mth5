@@ -5,7 +5,8 @@ from .models import Category, Product, Review
 from .serializers import (
     CategorySerializer, CategoryDetailSerializer,
     ProductSerializer, ProductDetailSerializer,
-    ReviewSerializer, ReviewDetailSerializer
+    ReviewSerializer, ReviewDetailSerializer,
+    ProductWithReviewsSerializer, CategoryWithCountSerializer
 )
 
 @api_view(['GET'])
@@ -68,4 +69,19 @@ def review_detail_api_view(request, id):
         )
 
     data = ReviewSerializer(review).data
+    return Response(data=data)
+
+
+
+@api_view(['GET'])
+def product_reviews_api_view(request):
+    products = Product.objects.all()
+    data = ProductWithReviewsSerializer(products, many=True).data
+    return Response(data=data)
+
+
+@api_view(['GET'])
+def category_with_count_api_view(request):
+    categories = Category.objects.all()
+    data = CategoryWithCountSerializer(categories, many=True).data
     return Response(data=data)

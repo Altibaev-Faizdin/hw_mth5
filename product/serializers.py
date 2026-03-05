@@ -6,7 +6,7 @@ from django.db.models import Avg
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = 'id name'.split()
+        fields = '__all__'
 
 
 class CategoryDetailSerializer(serializers.ModelSerializer):
@@ -15,11 +15,10 @@ class CategoryDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = 'id title price'.split()
+        fields = '__all__'
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -28,18 +27,17 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
-
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = 'id text'.split()
+        fields = '__all__'
 
 
 class ReviewDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+
 
 class ProductWithReviewsSerializer(serializers.ModelSerializer):
     reviews = ReviewDetailSerializer(many=True, read_only=True)
@@ -51,7 +49,6 @@ class ProductWithReviewsSerializer(serializers.ModelSerializer):
 
     def get_rating(self, obj):
         return obj.reviews.aggregate(avg=Avg('stars'))['avg']
-    
 
 
 class CategoryWithCountSerializer(serializers.ModelSerializer):
@@ -63,3 +60,4 @@ class CategoryWithCountSerializer(serializers.ModelSerializer):
 
     def get_products_count(self, obj):
         return obj.products.count()
+

@@ -61,3 +61,36 @@ class CategoryWithCountSerializer(serializers.ModelSerializer):
     def get_products_count(self, obj):
         return obj.products.count()
 
+
+
+
+
+class CategoryValidateSerializer(serializers.Serializer):
+    name = serializers.CharField(required=True, max_length=100, min_length=1)
+
+
+class ProductValidateSerializer(serializers.Serializer):
+    title = serializers.CharField(required=True, max_length=150, min_length=1)
+    description = serializers.CharField(required=True)
+    price = serializers.DecimalField(required=True, max_digits=10, decimal_places=2, min_value=0)
+    category_id = serializers.IntegerField(required=True)
+
+    def validate_category_id(self, category_id):
+        try:
+            Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            raise serializers.ValidationError('Category with this id does not exist!')
+        return category_id
+
+
+class ReviewValidateSerializer(serializers.Serializer):
+    text = serializers.CharField(required=True)
+    stars = serializers.IntegerField(required=True, min_value=1, max_value=5)
+    product_id = serializers.IntegerField(required=True)
+
+    def validate_product_id(self, product_id):
+        try:
+            Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            raise serializers.ValidationError('Product with this id does not exist!')
+        return product_id

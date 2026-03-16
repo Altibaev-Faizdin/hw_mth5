@@ -68,6 +68,14 @@ class CategoryWithCountSerializer(serializers.ModelSerializer):
 class CategoryValidateSerializer(serializers.Serializer):
     name = serializers.CharField(required=True, max_length=100, min_length=1)
 
+    def create(self, validated_data):
+        return Category.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.save()
+        return instance
+
 
 class ProductValidateSerializer(serializers.Serializer):
     title = serializers.CharField(required=True, max_length=150, min_length=1)
@@ -82,6 +90,17 @@ class ProductValidateSerializer(serializers.Serializer):
             raise serializers.ValidationError('Category with this id does not exist!')
         return category_id
 
+    def create(self, validated_data):
+        return Product.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.description = validated_data.get('description', instance.description)
+        instance.price = validated_data.get('price', instance.price)
+        instance.category_id = validated_data.get('category_id', instance.category_id)
+        instance.save()
+        return instance
+
 
 class ReviewValidateSerializer(serializers.Serializer):
     text = serializers.CharField(required=True)
@@ -94,3 +113,13 @@ class ReviewValidateSerializer(serializers.Serializer):
         except Product.DoesNotExist:
             raise serializers.ValidationError('Product with this id does not exist!')
         return product_id
+
+    def create(self, validated_data):
+        return Review.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.text = validated_data.get('text', instance.text)
+        instance.stars = validated_data.get('stars', instance.stars)
+        instance.product_id = validated_data.get('product_id', instance.product_id)
+        instance.save()
+        return instance

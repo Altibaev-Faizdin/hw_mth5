@@ -27,4 +27,7 @@ router.register(r'reviews', views.ReviewViewSet, basename='review')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include(router.urls)),
+    path('api/v1/users/register/', views.UserRegistrationView.as_view(), name='user-register'),
+    path('api/v1/users/login/', views.UserLoginView.as_view(), name='user-login'),
+    path('api/v1/users/confirm/', views.UserConfirmView.as_view(), name='user-confirm'),
 ]

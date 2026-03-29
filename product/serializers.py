@@ -2,7 +2,6 @@ from rest_framework import serializers
 from .models import Category, Product, Review, ConfirmationCode
 from django.db.models import Avg
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -11,19 +10,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CategoryDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = '__all__'
-
-
 class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = '__all__'
-
-
-class ProductDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'

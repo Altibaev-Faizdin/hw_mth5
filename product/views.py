@@ -1,10 +1,9 @@
 from rest_framework.response import Response
 from rest_framework import status, viewsets, generics
-from rest_framework.decorators import action, api_view
 from .models import Category, Product, Review, ConfirmationCode
 from .serializers import (
-    CategorySerializer, CategoryDetailSerializer,
-    ProductSerializer, ProductDetailSerializer,
+    CategorySerializer,
+    ProductSerializer,
     ReviewSerializer, ReviewDetailSerializer,
     ProductWithReviewsSerializer, CategoryWithCountSerializer,
     CategoryValidateSerializer, ProductValidateSerializer, ReviewValidateSerializer,
@@ -104,6 +103,6 @@ class UserConfirmView(generics.CreateAPIView):
         
         user_serializer = UserSerializer(user)
         return Response({
-            'message': 'Адрес электронной почты успешно подтвержден. Ваш аккаунт теперь активен..',
+            'message': 'Адрес электронной почты успешно подтвержден. Ваш аккаунт теперь активен.',
             'user': user_serializer.data
         }, status=status.HTTP_200_OK)

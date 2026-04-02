@@ -32,6 +32,8 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(','
 # Application definition
 
 INSTALLED_APPS = [
+    "unfold",                   
+    "unfold.contrib.filters", 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,8 +41,65 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'users',
     'product',
 ]
+
+UNFOLD = {
+    "SITE_TITLE": "My Shop",
+    "SITE_HEADER": "My Shop",
+    "SITE_SYMBOL": "shopping_bag",
+
+    "COLORS": {
+        "primary": {
+            "50": "255 247 237",
+            "100": "255 237 213",
+            "200": "254 215 170",
+            "300": "253 186 116",
+            "400": "251 146 60",
+            "500": "249 115 22",
+            "600": "234 88 12",
+            "700": "194 65 12",
+            "800": "154 52 18",
+            "900": "124 45 18",
+            "950": "67 20 7",
+        },
+    },
+
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
+        "navigation": [
+            {
+                "title": "Магазин",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {"title": "Категории", "icon": "category", "link": "/admin/product/category/"},
+                    {"title": "Товары", "icon": "inventory_2", "link": "/admin/product/product/"},
+                    {"title": "Отзывы", "icon": "star_rate", "link": "/admin/product/review/"},
+                ],
+            },
+            {
+                "title": "Пользователи",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {"title": "Пользователи", "icon": "manage_accounts", "link": "/admin/users/customuser/"},
+                    {"title": "Коды", "icon": "pin", "link": "/admin/users/confirmationcode/"},
+                ],
+            },
+            {
+                "title": "Система",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {"title": "Группы", "icon": "group", "link": "/admin/auth/group/"},
+                ],
+            },
+        ],
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -91,12 +150,8 @@ WSGI_APPLICATION = 'shop_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'shop_api'),
-        'USER': os.environ.get('DB_USER', 'shop_user'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -144,3 +199,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Custom User Model
+# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-user-model
+
+AUTH_USER_MODEL = 'users.CustomUser'

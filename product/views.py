@@ -9,6 +9,7 @@ from .serializers import (
     ProductWithReviewsSerializer, CategoryWithCountSerializer,
     CategoryValidateSerializer, ProductValidateSerializer, ReviewValidateSerializer,
 )
+from common.permissions import IsModerator
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -32,11 +33,18 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'id'
+    permission_classes = [IsModerator]
     
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
             return ProductValidateSerializer
         return ProductSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+    
+    def perform_update(self, serializer):
+        serializer.save()
     
     @action(detail=False, methods=['get'])
     def with_reviews(self, request):

@@ -10,9 +10,12 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    owner_email = serializers.CharField(source='owner.email', read_only=True)
+    
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['id', 'title', 'description', 'price', 'category', 'owner', 'owner_email', 'created', 'updated']
+        read_only_fields = ['owner', 'owner_email', 'created', 'updated']
 
 
 class ReviewSerializer(serializers.ModelSerializer):

@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework import status, viewsets, generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from .models import Category, Product, Review
 from .serializers import (
@@ -39,6 +40,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update']:
             return ProductValidateSerializer
         return ProductSerializer
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [IsAuthenticated()]
+        return [IsModerator()]
     
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

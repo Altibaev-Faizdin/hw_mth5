@@ -24,7 +24,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CustomUser
-        fields = ['email', 'password', 'password2', 'phone_number']
+        fields = ['email', 'password', 'password2', 'phone_number', 'birthdate']
         extra_kwargs = {
             'email': {'required': True}
         }
@@ -67,14 +67,14 @@ class UserLoginSerializer(serializers.Serializer):
         try:
             user = CustomUser.objects.get(email=email)
         except CustomUser.DoesNotExist:
-            raise serializers.ValidationError('Неверные учетные данные!')
+            raise serializers.ValidationError('Неверные учётные данные.')
         
         if not user.check_password(password):
-            raise serializers.ValidationError('Неверные учетные данные!')
+            raise serializers.ValidationError('Неверные учётные данные.')
         
         if not user.is_active:
             raise serializers.ValidationError(
-                'Учетная запись не активирована. Пожалуйста, подтвердите свою электронную почту.'
+                'Учётная запись не активирована. Подтвердите email-адрес.'
             )
         
         data['user'] = user
@@ -84,14 +84,14 @@ class UserLoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'phone_number', 'is_active', 'is_staff', 'created_at']
+        fields = ['id', 'email', 'phone_number', 'birthdate', 'is_active', 'is_staff', 'created_at']
         read_only_fields = ['id', 'created_at']
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['phone_number']
+        fields = ['phone_number', 'birthdate']
 
 
 class ConfirmationCodeSerializer(serializers.Serializer):

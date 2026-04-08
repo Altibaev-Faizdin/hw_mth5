@@ -16,6 +16,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         null=True,
         help_text='Phone number. Required for superusers.'
     )
+    birthdate = models.DateField(blank=True, null=True)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

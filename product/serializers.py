@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Category, Product, Review
 from django.db.models import Avg
+from common.validators import validate_age_for_product_creation
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -78,8 +79,14 @@ class ProductValidateSerializer(serializers.Serializer):
         try:
             Category.objects.get(id=category_id)
         except Category.DoesNotExist:
-            raise serializers.ValidationError('Категория с таким идентификатором не существует.!')
+            raise serializers.ValidationError('Категория с таким идентификатором не существует.')
         return category_id
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        if request and request.method == 'POST':
+            validate_age_for_product_creation(request)
+        return attrs
 
     def create(self, validated_data):
         return Product.objects.create(**validated_data)

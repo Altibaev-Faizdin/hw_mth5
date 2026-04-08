@@ -2,6 +2,7 @@ from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import CustomUser, ConfirmationCode
 from .serializers import (
@@ -27,7 +28,7 @@ class UserRegistrationView(generics.CreateAPIView):
         
         user_serializer = UserSerializer(user)
         return Response({
-            'message': 'Пользователь успешно зарегистрирован! Пожалуйста, подтвердите свой email.',
+            'message': 'Пользователь успешно зарегистрирован. Подтвердите email-адрес.',
             'user': user_serializer.data,
             'confirmation_code': confirmation_code.code  
         }, status=status.HTTP_201_CREATED)
@@ -41,11 +42,15 @@ class UserLoginView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
+        refresh = RefreshToken.for_user(user)
+        refresh['birthdate'] = user.birthdate.isoformat() if user.birthdate else None
         
         user_serializer = UserSerializer(user)
         return Response({
             'message': 'Вход успешен!',
-            'user': user_serializer.data
+            'user': user_serializer.data,
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
         }, status=status.HTTP_200_OK)
 
 
@@ -63,7 +68,7 @@ class UserConfirmView(generics.CreateAPIView):
         
         user_serializer = UserSerializer(user)
         return Response({
-            'message': 'Email успешно подтвержден! Ваш аккаунт активирован.',
+            'message': 'Email-адрес успешно подтверждён. Аккаунт активирован.',
             'user': user_serializer.data
         }, status=status.HTTP_200_OK)
 

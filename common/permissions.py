@@ -2,7 +2,7 @@ from rest_framework import permissions
 
 
 class IsModerator(permissions.BasePermission):
-    message = "У вас нет прав для выполнения этого действия. Только модератор может выполнять операции с продуктами."
+    message = "Недостаточно прав для выполнения этого действия."
 
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
@@ -12,7 +12,7 @@ class IsModerator(permissions.BasePermission):
             return False
         
         if request.method == 'POST':
-            self.message = "Модератор не может создавать продукты (POST запрещён)."
+            self.message = "Модератор не может создавать продукты."
             return False
         
         if request.method in permissions.SAFE_METHODS or request.method in ['PUT', 'PATCH', 'DELETE']:

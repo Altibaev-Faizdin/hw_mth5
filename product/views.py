@@ -1,70 +1,91 @@
-from rest_framework.response import Response
-from rest_framework import status, viewsets, generics
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import action
+from rest_framework import generics, permissions
+
+from common.permissions import IsModerator
 from .models import Category, Product, Review
 from .serializers import (
     CategorySerializer,
+    CategoryValidateSerializer,
+    CategoryWithCountSerializer,
     ProductSerializer,
-    ReviewSerializer, ReviewDetailSerializer,
-    ProductWithReviewsSerializer, CategoryWithCountSerializer,
-    CategoryValidateSerializer, ProductValidateSerializer, ReviewValidateSerializer,
+    ProductValidateSerializer,
+    ProductWithReviewsSerializer,
+    ReviewSerializer,
+    ReviewValidateSerializer,
 )
-from common.permissions import IsModerator
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    lookup_field = 'id'
-    
+
     def get_serializer_class(self):
-        if self.action in ['create', 'update', 'partial_update']:
+        if self.request.method == 'POST':
             return CategoryValidateSerializer
         return CategorySerializer
-    
-    @action(detail=False, methods=['get'])
-    def with_count(self, request):
-        categories = Category.objects.all()
-        serializer = CategoryWithCountSerializer(categories, many=True)
-        return Response(serializer.data)
 
 
-class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+class CategoryRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
     lookup_field = 'id'
-    permission_classes = [IsModerator]
-    
+
     def get_serializer_class(self):
-        if self.action in ['create', 'update', 'partial_update']:
+        if self.request.method in ('PUT', 'PATCH'):
+            return CategoryValidateSerializer
+        return CategorySerializer
+
+
+class CategoryWithCountListView(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategoryWithCountSerializer
+
+
+class ProductListCreateView(generics.ListCreateAPIView):
+    queryset = Product.objects.all()
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [permissions.IsAuthenticated()]
+        return [IsModerator()]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
             return ProductValidateSerializer
         return ProductSerializer
 
-    def get_permissions(self):
-        if self.action == 'create':
-            return [IsAuthenticated()]
-        return [IsModerator()]
-    
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-    
-    def perform_update(self, serializer):
-        serializer.save()
-    
-    @action(detail=False, methods=['get'])
-    def with_reviews(self, request):
-        products = Product.objects.all()
-        serializer = ProductWithReviewsSerializer(products, many=True)
-        return Response(serializer.data)
 
 
-class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
+class ProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
     lookup_field = 'id'
-    
+    permission_classes = [IsModerator]
+
     def get_serializer_class(self):
-        if self.action in ['create', 'update', 'partial_update']:
+        if self.request.method in ('PUT', 'PATCH'):
+            return ProductValidateSerializer
+        return ProductSerializer
+
+
+class ProductWithReviewsListView(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductWithReviewsSerializer
+    permission_classes = [IsModerator]
+
+
+class ReviewListCreateView(generics.ListCreateAPIView):
+    queryset = Review.objects.all()
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return ReviewValidateSerializer
+        return ReviewSerializer
+
+
+class ReviewRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    lookup_field = 'id'
+
+    def get_serializer_class(self):
+        if self.request.method in ('PUT', 'PATCH'):
             return ReviewValidateSerializer
         return ReviewSerializer

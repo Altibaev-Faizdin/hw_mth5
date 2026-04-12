@@ -9,7 +9,14 @@ def generate_confirmation_code():
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    class RegistrationSource(models.TextChoices):
+        LOCAL = 'local', 'Local'
+        GOOGLE = 'google', 'Google'
+        FACEBOOK = 'facebook', 'Facebook'
+
     email = models.EmailField(unique=True, max_length=255)
+    first_name = models.CharField(max_length=150, blank=True, default='')
+    last_name = models.CharField(max_length=150, blank=True, default='')
     phone_number = models.CharField(
         max_length=20, 
         blank=True, 
@@ -17,6 +24,18 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         help_text='Phone number. Required for superusers.'
     )
     birthdate = models.DateField(blank=True, null=True)
+    registration_source = models.CharField(
+        max_length=32,
+        choices=RegistrationSource.choices,
+        default=RegistrationSource.LOCAL,
+    )
+    google_sub = models.CharField(
+        max_length=255,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text='OpenID subject из Google (sub), для привязки аккаунта.',
+    )
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -36,10 +55,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.email
     
     def get_full_name(self):
-        return self.email
+        name = ' '.join(p for p in (self.first_name, self.last_name) if p).strip()
+        return name or self.email
     
     def get_short_name(self):
-        return self.email
+        return self.first_name or self.email
 
 
 class ConfirmationCode(models.Model):

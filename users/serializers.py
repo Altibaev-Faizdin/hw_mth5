@@ -46,6 +46,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password')
         user = CustomUser.objects.create_user(
             password=password,
+            registration_source=CustomUser.RegistrationSource.LOCAL,
             **validated_data
         )
         ConfirmationCode.objects.create(user=user)
@@ -84,14 +85,38 @@ class UserLoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'phone_number', 'birthdate', 'is_active', 'is_staff', 'created_at']
-        read_only_fields = ['id', 'created_at']
+        fields = [
+            'id',
+            'email',
+            'first_name',
+            'last_name',
+            'phone_number',
+            'birthdate',
+            'registration_source',
+            'is_active',
+            'is_staff',
+            'last_login',
+            'created_at',
+        ]
+        read_only_fields = [
+            'id',
+            'registration_source',
+            'last_login',
+            'created_at',
+            'is_active',
+            'is_staff',
+        ]
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['phone_number', 'birthdate']
+        fields = ['phone_number', 'birthdate', 'first_name', 'last_name']
+
+
+class GoogleOAuthSerializer(serializers.Serializer):
+    code = serializers.CharField(required=True)
+    redirect_uri = serializers.CharField(required=True, max_length=2048)
 
 
 class ConfirmationCodeSerializer(serializers.Serializer):

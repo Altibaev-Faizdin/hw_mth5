@@ -6,20 +6,54 @@ from .models import CustomUser, ConfirmationCode
 @admin.register(CustomUser)
 class CustomUserAdmin(BaseUserAdmin):
     model = CustomUser
-    list_display = ['email', 'phone_number', 'birthdate', 'is_active', 'is_staff', 'created_at']
-    list_filter = ['is_active', 'is_staff', 'is_superuser', 'created_at']
-    search_fields = ['email', 'phone_number']
+    list_display = [
+        'email',
+        'first_name',
+        'last_name',
+        'registration_source',
+        'phone_number',
+        'birthdate',
+        'is_active',
+        'is_staff',
+        'created_at',
+    ]
+    list_filter = ['is_active', 'is_staff', 'is_superuser', 'registration_source', 'created_at']
+    search_fields = ['email', 'phone_number', 'first_name', 'last_name', 'google_sub']
     ordering = ['-created_at']
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal Info', {'fields': ('phone_number', 'birthdate')}),
+        (
+            'Personal Info',
+            {
+                'fields': (
+                    'first_name',
+                    'last_name',
+                    'phone_number',
+                    'birthdate',
+                    'registration_source',
+                    'google_sub',
+                )
+            },
+        ),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'created_at', 'updated_at')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'phone_number', 'birthdate', 'is_active', 'is_staff', 'is_superuser'),
+            'fields': (
+                'email',
+                'password1',
+                'password2',
+                'first_name',
+                'last_name',
+                'phone_number',
+                'birthdate',
+                'registration_source',
+                'is_active',
+                'is_staff',
+                'is_superuser',
+            ),
         }),
     )
     readonly_fields = ['created_at', 'updated_at', 'last_login']
